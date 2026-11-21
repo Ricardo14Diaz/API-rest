@@ -1,25 +1,26 @@
 {
-  "name": "taller-api-productos",
+  "name": "catalogo-api",
   "version": "1.0.0",
   "private": true,
-  "description": "API REST con Express, SQLite y autenticacion JWT para el taller individual.",
+  "description": "API REST de catálogo de productos y favoritos con Express, PostgreSQL, JWT y roles.",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
     "db:init": "node scripts/init-db.js",
-    "test": "node --test"
+    "admin:crear": "node scripts/crear-admin.js"
   },
   "engines": {
     "node": ">=20"
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",
-    "better-sqlite3": "^12.2.0",
     "dotenv": "^16.6.1",
     "express": "^5.1.0",
-    "jsonwebtoken": "^9.0.2"
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.23.1"
   },
   "devDependencies": {
-    "supertest": "^7.1.4"
+    "nodemon": "^3.1.14"
   }
 }

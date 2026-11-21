@@ -1,30 +1,25 @@
-require('dotenv').config();
+const fs = require('node:fs');
+const path = require('node:path');
+const pool = require('../src/db');
 
-const bcrypt = require('bcryptjs');
-const db = require('../src/db');
+async function inicializar() {
+  const schema = fs.readFileSync(path.join(__dirname, '../db/schema.sql'), 'utf8');
+  await pool.query(schema);
 
-async function initialize() {
-  const username = process.env.INITIAL_USERNAME;
-  const password = process.env.INITIAL_PASSWORD;
-
-  if (!username || !password || password.length < 8) {
-    throw new Error('Define INITIAL_USERNAME e INITIAL_PASSWORD (mínimo 8 caracteres) en .env.');
+  const { rows } = await pool.query('SELECT COUNT(*)::int AS total FROM productos');
+  if (rows[0].total === 0) {
+    const seed = fs.readFileSync(path.join(__dirname, '../db/seed.sql'), 'utf8');
+    await pool.query(seed);
+    console.log('Productos de ejemplo cargados.');
+  } else {
+    console.log('Ya existen productos; no se cargaron datos de ejemplo.');
   }
-
-  const existing = db.prepare('SELECT id FROM users WHERE username = ?').get(username);
-  if (existing) {
-    console.log(`La cuenta de prueba "${username}" ya existe; no se modificó.`);
-    return;
-  }
-
-  const passwordHash = await bcrypt.hash(password, 12);
-  db.prepare('INSERT INTO users (username, password_hash) VALUES (?, ?)').run(username, passwordHash);
-  console.log(`Base de datos inicializada. Cuenta de prueba creada: ${username}`);
+  console.log('Base de datos lista.');
 }
 
-initialize()
+inicializar()
   .catch((error) => {
-    console.error(error.message);
+    console.error('Error inicializando la base de datos:', error.message);
     process.exitCode = 1;
   })
-  .finally(() => db.close());
+  .finally(() => pool.end());
