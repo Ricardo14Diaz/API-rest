@@ -13,5 +13,11 @@ module.exports = {
   jwtSecret,
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '1h',
   port: Number(process.env.PORT) || 3000,
-  databasePath: path.resolve(process.cwd(), process.env.DB_PATH || 'data/workshop.sqlite'),
+  db: {
+    host: process.env.DB_HOST,
+    port: Number(process.env.DB_PORT) || 5432,
+    database: process.env.DB_NAME,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+  },
 };
