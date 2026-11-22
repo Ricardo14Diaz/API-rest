@@ -1,7 +1,6 @@
 const jwt = require('jsonwebtoken');
 const { jwtSecret } = require('../config');
 
-// Verifica firma y expiración del JWT; deja la identidad en req.user.
 function requireAuth(req, res, next) {
   const match = (req.get('authorization') || '').match(/^Bearer\s+(.+)$/i);
 
@@ -18,7 +17,6 @@ function requireAuth(req, res, next) {
   }
 }
 
-// Debe usarse después de requireAuth.
 function requireAdmin(req, res, next) {
   if (req.user.rol !== 'admin') {
     return res.status(403).json({ error: 'No tienes permiso para realizar esta acción.' });

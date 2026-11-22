@@ -30,7 +30,7 @@ async function login(req, res) {
 
   const usuario = await usuarios.buscarPorCorreo(req.body.correo.trim().toLowerCase());
   const coincide = usuario && (await bcrypt.compare(req.body.password, usuario.password_hash));
-  if (!coincide) {
+  if (!coincide || usuario.rol !== req.body.rol) {
     return res.status(401).json({ error: 'Credenciales incorrectas.' });
   }
 

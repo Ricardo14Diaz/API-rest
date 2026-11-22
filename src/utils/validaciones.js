@@ -1,5 +1,6 @@
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const CAMPOS_REGISTRO = new Set(['nombre', 'correo', 'password']);
+const CAMPOS_LOGIN = new Set(['correo', 'password', 'rol']);
 const CAMPOS_PRODUCTO = new Set(['nombre', 'descripcion', 'categoria', 'precio']);
 
 const esTextoNoVacio = (v) => typeof v === 'string' && v.trim().length > 0;
@@ -26,8 +27,15 @@ function validarRegistro(body) {
 }
 
 function validarLogin(body) {
-  if (!esObjeto(body) || typeof body.correo !== 'string' || typeof body.password !== 'string') {
+  if (!esObjeto(body)) return 'El cuerpo debe ser un objeto JSON.';
+  if (Object.keys(body).some((campo) => !CAMPOS_LOGIN.has(campo))) {
+    return 'El cuerpo contiene campos no permitidos.';
+  }
+  if (typeof body.correo !== 'string' || typeof body.password !== 'string') {
     return 'correo y password son obligatorios.';
+  }
+  if (body.rol !== 'usuario' && body.rol !== 'admin') {
+    return 'rol es obligatorio y debe ser usuario o admin.';
   }
   return null;
 }

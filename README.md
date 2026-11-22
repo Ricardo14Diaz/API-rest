@@ -71,36 +71,32 @@ Servidor en `http://localhost:3000`.
 
 Prefijo `/api`. Todas las respuestas son JSON. Los errores tienen la forma `{ "error": "mensaje" }`.
 
-| Método | Ruta | Acceso | Cuerpo | Respuestas |
-| --- | --- | --- | --- | --- |
-| POST | `/api/auth/registro` | Público | `{ nombre, correo, password }` (mín. 8 caracteres) | 201 `{ usuario }`, 400, 409 correo duplicado |
-| POST | `/api/auth/login` | Público | `{ correo, password }` | 200 `{ token, token_type, expires_in }`, 400, 401 |
-| GET | `/api/productos?categoria=` | Público | - | 200 `{ productos }`, 400 |
-| GET | `/api/productos/:id` | Público | - | 200 `{ producto }`, 400, 404 |
-| POST | `/api/productos` | Admin | `{ nombre, descripcion, categoria, precio }` | 201 `{ producto }`, 400, 401, 403 |
-| PUT | `/api/productos/:id` | Admin | Uno o más de los campos anteriores | 200 `{ producto }`, 400, 401, 403, 404 |
-| DELETE | `/api/productos/:id` | Admin | - | 204, 400, 401, 403, 404 |
-| GET | `/api/favoritos` | Autenticado | - | 200 `{ favoritos }`, 401 |
-| POST | `/api/favoritos` | Autenticado | `{ productoId }` (número) | 201, 400, 401, 404 producto inexistente, 409 duplicado |
-| DELETE | `/api/favoritos/:productoId` | Autenticado | - | 204, 400, 401, 404 |
+| Grupo | Método | Endpoint | Acceso | Solicitud | Respuesta correcta |
+|:---|:---:|---|---|---|---|
+| Auth | `POST` | `/api/auth/registro` | Público | `{ nombre, correo, password }` | `201` `{ usuario }` |
+| Auth | `POST` | `/api/auth/login` | Público | `{ correo, password, rol }` (`usuario` o `admin`) | `200` `{ token, token_type, expires_in }` |
+| Productos | `GET` | `/api/productos?categoria={categoria}` (opcional) | Público | - | `200` `{ productos }` |
+| Productos | `GET` | `/api/productos/:id` | Público | - | `200` `{ producto }` |
+| Productos | `POST` | `/api/productos` | Admin | `{ nombre, descripcion, categoria, precio }` | `201` `{ producto }` |
+| Productos | `PUT` | `/api/productos/:id` | Admin | Uno o más campos del producto | `200` `{ producto }` |
+| Productos | `DELETE` | `/api/productos/:id` | Admin | - | `204 No Content` |
+| Favoritos | `GET` | `/api/favoritos` | Autenticado | - | `200` `{ favoritos }` |
+| Favoritos | `POST` | `/api/favoritos` | Autenticado | `{ productoId }` (número) | `201 Created` |
+| Favoritos | `DELETE` | `/api/favoritos/:productoId` | Autenticado | - | `204 No Content` |
 
-Las rutas protegidas requieren `Authorization: Bearer <token>`.
+Las rutas de administrador y autenticadas requieren `Authorization: Bearer <token>`.
 
-**Criterio de códigos de error:** 400 para cuerpo inválido, campos vacíos o faltantes, campos no permitidos, precio inválido o id mal formado; 401 para token ausente, inválido o vencido y credenciales incorrectas; 403 para rol insuficiente; 404 para recursos inexistentes; 409 para duplicados. No se usa 422.
+En el login, `rol` debe coincidir con el rol guardado para esa cuenta: usa `"rol": "admin"` para el administrador y `"rol": "usuario"` para una cuenta normal. Este campo no asigna ni eleva permisos; el token siempre obtiene el rol de la base de datos.
+
+**Criterio de códigos de error:** 400 para cuerpo inválido, campos vacíos o faltantes, campos no permitidos, precio inválido o id mal formado; 401 para token ausente, inválido o vencido, credenciales incorrectas o rol que no coincide; 403 para rol insuficiente; 404 para recursos inexistentes; 409 para duplicados. No se usa 422.
 
 **Seguridad:** las contraseñas se guardan con bcrypt y nunca se devuelven. La identidad en favoritos sale del token verificado, no del cliente. El mismo mensaje de error en login no revela si falló el correo o la contraseña.
 
 ## Pruebas en Postman
 
 1. Importa `postman/catalogo-api.postman_collection.json` y `postman/catalogo-api.postman_environment.json`.
-2. En el entorno completa `admin_password` (la de `ADMIN_PASSWORD`) y `jwt_secret` (el mismo valor que `JWT_SECRET`, solo para generar el token vencido). Estos valores van solo en tu copia local.
+2. En el entorno completa `admin_password` con el valor de `ADMIN_PASSWORD`. Este valor va solo en tu copia local.
 3. Con el servidor iniciado, ejecuta las carpetas 1 a 5 en orden (Runner > Run collection).
 4. Reinicia Node.js (`Ctrl+C` y `npm start`) y ejecuta la carpeta 6 para evidenciar la persistencia.
 
-Casos cubiertos: registro y login, correo duplicado, credenciales incorrectas, intento de asignarse rol admin, CRUD de productos como admin, filtro por categoría, precio inválido, campos vacíos, producto inexistente, 401 sin token, vencido y manipulado, 403 con rol usuario, favoritos (crear, consultar, eliminar, 409 y 404), aislamiento entre usuarios A y B, eliminación en cascada y persistencia.
-
-## Créditos y recursos
-
-- Estructura inicial tomada del repositorio https://github.com/Sgarcia27/S11-Tarea_2 (Express + SQLite + JWT), adaptada: migración a PostgreSQL, roles, registro, favoritos por usuario y separación en rutas, controladores y modelos.
-- Librerías: Express, pg, bcryptjs, jsonwebtoken, dotenv.
-- Se utilizó Claude (Anthropic) como asistente de apoyo en el desarrollo; el código fue revisado y explicado por el autor.
+Casos cubiertos: registro y login de usuario, login de admin, consulta pública de productos, CRUD de productos como admin, 401 sin token, 403 con rol usuario, agregar y consultar favoritos, eliminación de producto con borrado en cascada de favoritos y persistencia tras reiniciar.
