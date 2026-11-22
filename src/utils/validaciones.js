@@ -6,7 +6,6 @@ const CAMPOS_PRODUCTO = new Set(['nombre', 'descripcion', 'categoria', 'precio']
 const esTextoNoVacio = (v) => typeof v === 'string' && v.trim().length > 0;
 const esObjeto = (b) => b !== null && typeof b === 'object' && !Array.isArray(b);
 
-// Identificador entero positivo que cabe en un INT de PostgreSQL.
 function esIdValido(valor) {
   return /^[1-9]\d{0,9}$/.test(String(valor)) && Number(valor) <= 2147483647;
 }

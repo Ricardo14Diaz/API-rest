@@ -1,6 +1,5 @@
 const pool = require('../db');
 
-// precio es NUMERIC: se convierte a número para que el JSON no lo devuelva como texto.
 const COLUMNAS = 'id, nombre, descripcion, categoria, precio::float8 AS precio';
 
 async function listar(categoria) {
@@ -28,7 +27,6 @@ async function crear({ nombre, descripcion, categoria, precio }) {
   return rows[0];
 }
 
-// Solo cambia los campos enviados (COALESCE conserva el valor actual si llega null).
 async function actualizar(id, { nombre, descripcion, categoria, precio }) {
   const { rows } = await pool.query(
     `UPDATE productos

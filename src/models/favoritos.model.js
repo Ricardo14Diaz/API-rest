@@ -12,7 +12,6 @@ async function listar(usuarioId) {
   return rows;
 }
 
-// Devuelve false si el favorito ya existía (la clave primaria compuesta evita duplicados).
 async function agregar(usuarioId, productoId) {
   const { rowCount } = await pool.query(
     `INSERT INTO favoritos (usuario_id, producto_id)
@@ -23,7 +22,6 @@ async function agregar(usuarioId, productoId) {
   return rowCount > 0;
 }
 
-// Filtra siempre por usuario_id: nadie puede quitar favoritos ajenos.
 async function quitar(usuarioId, productoId) {
   const { rowCount } = await pool.query(
     'DELETE FROM favoritos WHERE usuario_id = $1 AND producto_id = $2',

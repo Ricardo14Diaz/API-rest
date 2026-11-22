@@ -15,8 +15,6 @@ CREATE TABLE IF NOT EXISTS productos (
   precio NUMERIC(10, 2) NOT NULL CHECK (precio > 0)
 );
 
--- La clave primaria compuesta impide favoritos duplicados.
--- ON DELETE CASCADE: al eliminar un producto (o un usuario) se eliminan sus favoritos.
 CREATE TABLE IF NOT EXISTS favoritos (
   usuario_id INT NOT NULL REFERENCES usuarios (id) ON DELETE CASCADE,
   producto_id INT NOT NULL REFERENCES productos (id) ON DELETE CASCADE,

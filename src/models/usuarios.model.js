@@ -1,6 +1,5 @@
 const pool = require('../db');
 
-// El rol no se recibe como parámetro: el registro siempre crea 'usuario' (valor por defecto de la tabla).
 async function crear({ nombre, correo, passwordHash }) {
   const { rows } = await pool.query(
     `INSERT INTO usuarios (nombre, correo, password_hash)

@@ -88,6 +88,8 @@ Las rutas de administrador y autenticadas requieren `Authorization: Bearer <toke
 
 En el login, `rol` debe coincidir con el rol guardado para esa cuenta: usa `"rol": "admin"` para el administrador y `"rol": "usuario"` para una cuenta normal. Este campo no asigna ni eleva permisos; el token siempre obtiene el rol de la base de datos.
 
+El registro público no recibe el campo `rol`: crea siempre cuentas `usuario`. Las cuentas administradoras se crean únicamente mediante `npm run admin:crear`.
+
 **Criterio de códigos de error:** 400 para cuerpo inválido, campos vacíos o faltantes, campos no permitidos, precio inválido o id mal formado; 401 para token ausente, inválido o vencido, credenciales incorrectas o rol que no coincide; 403 para rol insuficiente; 404 para recursos inexistentes; 409 para duplicados. No se usa 422.
 
 **Seguridad:** las contraseñas se guardan con bcrypt y nunca se devuelven. La identidad en favoritos sale del token verificado, no del cliente. El mismo mensaje de error en login no revela si falló el correo o la contraseña.

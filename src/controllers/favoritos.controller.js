@@ -2,7 +2,6 @@ const favoritos = require('../models/favoritos.model');
 const productos = require('../models/productos.model');
 const { esIdValido } = require('../utils/validaciones');
 
-// La identidad sale siempre de req.user (token verificado), nunca del cuerpo ni de la URL.
 async function listar(req, res) {
   const lista = await favoritos.listar(req.user.id);
   return res.status(200).json({ favoritos: lista });
